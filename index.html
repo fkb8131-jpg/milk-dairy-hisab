@@ -1,348 +1,259 @@
+
 <!DOCTYPE html>
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Milk Dairy Hisab Pro (Secure)</title>
+    <title>Daily Milk Record Pro</title>
     <style>
-        /* CSS Design */
+        /* Modern UI Design */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f0f4f8; color: #333; }
 
-        /* Auth Screens (Login/Register/Forgot) */
-        .auth-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background: linear-gradient(135deg, #007bff, #00c6ff); color: white; position: fixed; top: 0; left: 0; width: 100%; z-index: 200; }
-        .login-box { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; width: 85%; max-width: 350px; }
-        .login-box h2 { color: #007bff; margin-bottom: 5px; }
-        .login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box;}
-        .login-link { color: #007bff; cursor: pointer; text-decoration: underline; font-size: 14px; margin-top: 15px; display: block; }
+        /* Auth Screen Styling */
+        .auth-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background: #007bff; color: white; position: fixed; top: 0; left: 0; width: 100%; z-index: 200; }
+        .login-box { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; width: 85%; max-width: 350px; color: #333; }
+        .login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
         
-        .btn { background-color: #007bff; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 18px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px; transition: 0.3s; }
-        .btn:hover { background-color: #0056b3; }
-        .btn-danger { background-color: #ff4d4d; width: auto; padding: 5px 10px; font-size: 14px; }
-        
-        /* App Screen */
-        #app-screen { display: none; }
-        header { background-color: #007bff; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        /* App Header - Blue as per your Image */
+        header { background-color: #007bff; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         .menu-icon { font-size: 24px; cursor: pointer; }
         
         /* Sidebar */
-        #sidebar { height: 100%; width: 0; position: fixed; z-index: 101; top: 0; left: 0; background-color: #111; overflow-x: hidden; transition: 0.4s; padding-top: 60px; }
-        #sidebar a { padding: 8px 8px 8px 32px; text-decoration: none; font-size: 20px; color: #818181; display: block; transition: 0.3s; }
-        #sidebar a:hover { color: #f1f1f1; }
-        .closebtn { position: absolute; top: 0; right: 25px; font-size: 36px; margin-left: 50px; }
+        #sidebar { height: 100%; width: 0; position: fixed; z-index: 150; top: 0; left: 0; background-color: #111; overflow-x: hidden; transition: 0.4s; padding-top: 60px; }
+        #sidebar a { padding: 15px 32px; text-decoration: none; font-size: 18px; color: #818181; display: block; border-bottom: 1px solid #222; }
 
-        /* Content */
-        .container { padding: 20px; max-width: 600px; margin: auto; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .form-group { margin-bottom: 15px; position: relative; }
-        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; color: #555; }
-        .form-group input { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+        /* Container */
+        .container { padding: 15px; max-width: 500px; margin: auto; }
         
-        .voice-btn { position: absolute; right: 5px; top: 32px; background: #28a745; color: white; border: none; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; }
+        /* Stats Card */
+        .total-box { background: #28a745; color: white; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(40,167,69,0.2); }
+        .total-amount { font-size: 30px; font-weight: 800; }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
-        th, td { border-bottom: 1px solid #ddd; padding: 10px 5px; text-align: left; }
-        th { background-color: #f8f9fa; color: #333; }
+        /* Entry Card */
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #eef; }
+        .form-group { margin-bottom: 12px; position: relative; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; color: #555; font-size: 14px; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; background: #fafafa; }
         
-        .total-box { background: #28a745; color: white; padding: 15px; border-radius: 10px; font-size: 20px; font-weight: bold; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3); }
+        .voice-btn { position: absolute; right: 8px; top: 28px; background: #28a745; color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; }
 
-        .search-container { position: relative; margin-bottom: 15px; }
-        .search-container input { width: 100%; padding: 10px 10px 10px 35px; border: 2px solid #007bff; border-radius: 20px; outline: none; }
-        .search-icon { position: absolute; left: 12px; top: 12px; color: #007bff; }
+        /* Blue Save Button as per image */
+        .btn-save { background-color: #007bff; color: white; border: none; padding: 14px; border-radius: 8px; font-size: 18px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; }
 
-        /* Print Media Query */
+        /* Professional Record List (Clean & Fast) */
+        .record-item { background: white; padding: 12px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; border-left: 5px solid #007bff; }
+        .record-item.pay-type { border-left-color: #ff4d4d; }
+        
+        .record-info { display: flex; flex-direction: column; }
+        .record-name { font-size: 16px; font-weight: 700; color: #222; }
+        .record-date { font-size: 11px; color: #888; }
+        .record-badge { font-size: 10px; padding: 2px 5px; border-radius: 4px; font-weight: bold; width: fit-content; margin-bottom: 4px; }
+        .badge-milk { background: #e7f3ff; color: #007bff; }
+        .badge-pay { background: #fee; color: #ff4d4d; }
+        
+        .record-amount { text-align: right; font-weight: 800; font-size: 17px; }
+        .amt-green { color: #28a745; }
+        .amt-red { color: #ff4d4d; }
+
+        .btn-del { background: #ff4d4d; color: white; border: none; padding: 8px; border-radius: 8px; cursor: pointer; }
+
+        .search-bar { width: 100%; padding: 12px 12px 12px 40px; border: 2px solid #007bff; border-radius: 25px; outline: none; box-sizing: border-box; background: white; }
+
         @media print {
-            #sidebar, header, .form-card, .btn-print, .auth-screen, .search-container, .voice-btn, .btn-danger { display: none !important; }
-            #app-screen, .container { display: block !important; }
-            .card { box-shadow: none; border: 1px solid #ddd; }
+            #sidebar, header, .form-card, .btn-del, .voice-btn, .auth-screen { display: none !important; }
+            #app-screen, .container { display: block !important; width: 100%; }
+            .record-item { border: 1px solid #ddd; }
         }
     </style>
 </head>
 <body>
 
-    <div id="register-screen" class="auth-screen" style="display:none;">
-        <div class="login-box">
+    <div id="auth-box" class="auth-screen" style="display:none;">
+        <div class="login-box" id="reg-form">
             <h2>🆕 Account Banayein</h2>
-            <p style="color:#777; font-size:13px;">Pehli baar setup karein</p>
-            <input type="text" id="reg-username" placeholder="Apna Username Set Karein">
-            <input type="password" id="reg-password" placeholder="Naya Password">
-            <input type="text" id="reg-secret" placeholder="Secret Code (Password bhulne par kaam ayega)">
-            <button class="btn" onclick="registerUser()">Create Account</button>
+            <input type="text" id="ru" placeholder="Username">
+            <input type="password" id="rp" placeholder="Password">
+            <input type="text" id="rs" placeholder="Secret Code (Security)">
+            <button class="btn-save" onclick="register()">Create Account</button>
         </div>
-    </div>
-
-    <div id="login-screen" class="auth-screen" style="display:none;">
-        <div class="login-box">
+        <div class="login-box" id="log-form" style="display:none;">
             <h2>🔐 Login Karein</h2>
-            <p style="color:#777; margin-bottom:20px;">Doodh Wala Pro</p>
-            <input type="text" id="login-username" placeholder="User ID">
-            <input type="password" id="login-password" placeholder="Password">
-            <button class="btn" onclick="login()">Login</button>
-            <span class="login-link" onclick="showForgotScreen()">Password bhul gaye?</span>
+            <input type="text" id="lu" placeholder="User ID">
+            <input type="password" id="lp" placeholder="Password">
+            <button class="btn-save" onclick="login()">Login</button>
         </div>
     </div>
 
-    <div id="forgot-screen" class="auth-screen" style="display:none;">
-        <div class="login-box">
-            <h2 style="color:#ff4d4d">⚠️ Password Reset</h2>
-            <p style="color:#777;">Apna Secret Code Dalein</p>
-            <input type="text" id="reset-secret" placeholder="Wahi Secret Code dalein">
-            <input type="password" id="new-password" placeholder="Naya Password banayein">
-            <button class="btn" onclick="resetPassword()">Reset Password</button>
-            <span class="login-link" onclick="checkAuthStatus()">Wapas Login karein</span>
-        </div>
-    </div>
-
-    <div id="app-screen">
-        
+    <div id="main-app" style="display:none;">
         <div id="sidebar">
-            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-            <a href="#">🏠 Home</a>
-            <a href="#" onclick="clearAllData()">⚠️ Clear All Data</a>
+            <a href="javascript:void(0)" onclick="closeNav()" style="font-size:30px; color:white;">&times; Close</a>
             <a href="#" onclick="logout()">🚪 Logout</a>
+            <a href="#" onclick="resetData()" style="color:red">🗑️ Delete All Data</a>
         </div>
 
         <header>
             <span class="menu-icon" onclick="openNav()">&#9776;</span>
             <span>Daily Milk Record</span>
-            <span onclick="printBill()" style="font-size: 20px; cursor: pointer;">🖨️</span>
+            <span onclick="window.print()" style="font-size: 24px; cursor: pointer;">🖨️</span>
         </header>
 
         <div class="container">
-            
             <div class="total-box">
-                Total Bill: ₹ <span id="grandTotal">0</span>
+                <div style="font-size:12px;">NET BALANCE (KUL BAAKI)</div>
+                <div class="total-amount">₹ <span id="grandTotal">0</span></div>
             </div>
 
             <div class="card form-card">
-                <h3>📝 Naya Hisab Jodein</h3>
                 <div class="form-group">
-                    <label>Customer Name:</label>
-                    <input type="text" id="custName" placeholder="Naam bole ya likhein">
-                    <button class="voice-btn" onclick="startVoice('custName')">🎤</button>
+                    <label>Entry Type</label>
+                    <select id="type" onchange="toggleInputs()">
+                        <option value="milk">🥛 Milk (Doodh)</option>
+                        <option value="pay">💸 Advance / Payment</option>
+                    </select>
                 </div>
-                <div style="display: flex; gap: 10px;">
+
+                <div class="form-group">
+                    <label>Customer Name</label>
+                    <input type="text" id="cust-name" placeholder="Naam likhein...">
+                    <button class="voice-btn" onclick="startVoice()">🎤</button>
+                </div>
+
+                <div id="milk-inputs" style="display: flex; gap: 10px;">
                     <div class="form-group" style="flex:1">
-                        <label>Liter (L):</label>
+                        <label>Liter (L)</label>
                         <input type="number" id="liters" placeholder="0">
                     </div>
                     <div class="form-group" style="flex:1">
-                        <label>Rate (₹):</label>
+                        <label>Rate (₹)</label>
                         <input type="number" id="rate" value="60">
                     </div>
                 </div>
-                <button class="btn" onclick="addEntry()">✅ Save Entry</button>
+
+                <div id="pay-inputs" class="form-group" style="display:none;">
+                    <label>Amount (₹ Paisa)</label>
+                    <input type="number" id="amt" placeholder="0">
+                </div>
+
+                <button class="btn-save" onclick="saveEntry()">✅ Save Entry</button>
             </div>
 
-            <div class="card">
-                <h3 style="display:flex; justify-content:space-between;">
-                    📅 Record List <span style="font-size:14px; color:#777" id="entryCount">(0)</span>
-                </h3>
-                <div class="search-container">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" id="searchBar" onkeyup="filterData()" placeholder="Naam se search karein...">
-                </div>
-                <table id="recordTable">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Name</th>
-                            <th>Ltr/Price</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+            <div class="form-group" style="position:relative;">
+                <span style="position:absolute; left:15px; top:12px; color:#007bff;">🔍</span>
+                <input type="text" id="search" onkeyup="filter()" class="search-bar" placeholder="Naam se search karein...">
             </div>
+
+            <div id="list"></div>
         </div>
     </div>
 
     <script>
-        // --- DATA MANAGEMENT ---
-        let milkData = JSON.parse(localStorage.getItem('milkData')) || [];
-        let userCreds = JSON.parse(localStorage.getItem('userCreds')) || null;
+        let db = JSON.parse(localStorage.getItem('milk_db')) || [];
+        let authData = JSON.parse(localStorage.getItem('milk_auth')) || null;
 
-        // Window Load Logic
-        window.onload = function() {
-            if(localStorage.getItem('isLoggedIn') === 'true') {
-                showAppScreen();
-            } else {
-                checkAuthStatus();
-            }
+        window.onload = () => {
+            if(localStorage.getItem('isLoggedIn')) showMain();
+            else checkAuth();
         };
 
-        // --- AUTH SYSTEM LOGIC ---
-
-        function checkAuthStatus() {
-            hideAllScreens();
-            if(userCreds) {
-                // User already exists -> Show Login
-                document.getElementById('login-screen').style.display = 'flex';
-            } else {
-                // No user -> Show Register
-                document.getElementById('register-screen').style.display = 'flex';
+        function checkAuth() {
+            document.getElementById('auth-box').style.display = 'flex';
+            if(authData) {
+                document.getElementById('reg-form').style.display = 'none';
+                document.getElementById('log-form').style.display = 'block';
             }
         }
 
-        function registerUser() {
-            let u = document.getElementById('reg-username').value;
-            let p = document.getElementById('reg-password').value;
-            let s = document.getElementById('reg-secret').value;
-
+        function register() {
+            let u = document.getElementById('ru').value, p = document.getElementById('rp').value, s = document.getElementById('rs').value;
             if(u && p && s) {
-                userCreds = { username: u, password: p, secret: s };
-                localStorage.setItem('userCreds', JSON.stringify(userCreds));
-                alert("✅ Account Ban Gaya! Ab login karein.");
-                checkAuthStatus();
-            } else {
-                alert("❌ Sabhi details bharna zaruri hai!");
+                authData = {u, p, s};
+                localStorage.setItem('milk_auth', JSON.stringify(authData));
+                checkAuth();
             }
         }
 
         function login() {
-            let u = document.getElementById('login-username').value;
-            let p = document.getElementById('login-password').value;
-
-            if(userCreds && u === userCreds.username && p === userCreds.password) {
+            let u = document.getElementById('lu').value, p = document.getElementById('lp').value;
+            if(authData && u === authData.u && p === authData.p) {
                 localStorage.setItem('isLoggedIn', 'true');
-                showAppScreen();
+                showMain();
+            } else { alert("Galat ID/Password!"); }
+        }
+
+        function showMain() {
+            document.getElementById('auth-box').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            render();
+        }
+
+        function toggleInputs() {
+            let t = document.getElementById('type').value;
+            document.getElementById('milk-inputs').style.display = (t === 'milk') ? 'flex' : 'none';
+            document.getElementById('pay-inputs').style.display = (t === 'pay') ? 'block' : 'none';
+        }
+
+        function saveEntry() {
+            let n = document.getElementById('cust-name').value, t = document.getElementById('type').value;
+            if(!n) return;
+
+            let entry = { id: Date.now(), name: n, type: t, date: new Date().toLocaleDateString('en-GB') + " " + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) };
+
+            if(t === 'milk') {
+                let l = parseFloat(document.getElementById('liters').value), r = parseFloat(document.getElementById('rate').value);
+                if(isNaN(l)) return;
+                entry.total = l * r;
+                entry.desc = l + "L @ ₹" + r;
             } else {
-                alert("❌ Galat Username ya Password!");
-            }
-        }
-
-        function showForgotScreen() {
-            hideAllScreens();
-            document.getElementById('forgot-screen').style.display = 'flex';
-        }
-
-        function resetPassword() {
-            let s = document.getElementById('reset-secret').value;
-            let newP = document.getElementById('new-password').value;
-
-            if(userCreds && s === userCreds.secret) {
-                if(newP) {
-                    userCreds.password = newP;
-                    localStorage.setItem('userCreds', JSON.stringify(userCreds));
-                    alert("✅ Password Reset ho gaya! Naya password use karein.");
-                    checkAuthStatus();
-                } else {
-                    alert("Naya password dalein.");
-                }
-            } else {
-                alert("❌ Secret Code galat hai!");
-            }
-        }
-
-        function logout() {
-            localStorage.removeItem('isLoggedIn');
-            checkAuthStatus();
-        }
-
-        function hideAllScreens() {
-            document.getElementById('register-screen').style.display = 'none';
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('forgot-screen').style.display = 'none';
-            document.getElementById('app-screen').style.display = 'none';
-        }
-
-        function showAppScreen() {
-            hideAllScreens();
-            document.getElementById('app-screen').style.display = 'block';
-            renderTable(milkData);
-        }
-
-        // --- APP CORE LOGIC (Same as before) ---
-        function openNav() { document.getElementById("sidebar").style.width = "250px"; }
-        function closeNav() { document.getElementById("sidebar").style.width = "0"; }
-
-        function addEntry() {
-            let name = document.getElementById("custName").value;
-            let lit = parseFloat(document.getElementById("liters").value);
-            let rate = parseFloat(document.getElementById("rate").value);
-            
-            if(!name || isNaN(lit) || isNaN(rate)) { alert("Sabhi details bharein!"); return; }
-
-            let date = new Date();
-            let dateStr = date.getDate() + "/" + (date.getMonth()+1) + " " + formatTime(date);
-
-            let newEntry = { id: Date.now(), date: dateStr, name: name, liters: lit, rate: rate, total: lit * rate };
-
-            milkData.unshift(newEntry);
-            saveData();
-            document.getElementById("custName").value = "";
-            document.getElementById("liters").value = "";
-            document.getElementById("searchBar").value = "";
-            renderTable(milkData); 
-            alert("✅ Hisab Save Ho Gaya!");
-        }
-
-        function deleteEntry(id) {
-            if(confirm("Entry delete karein?")) {
-                milkData = milkData.filter(entry => entry.id !== id);
-                saveData();
-                filterData();
-            }
-        }
-
-        function saveData() { localStorage.setItem('milkData', JSON.stringify(milkData)); }
-
-        function filterData() {
-            let query = document.getElementById("searchBar").value.toLowerCase();
-            let filteredList = milkData.filter(item => item.name.toLowerCase().includes(query));
-            renderTable(filteredList);
-        }
-
-        function renderTable(dataToRender) {
-            let tableBody = document.getElementById("recordTable").getElementsByTagName('tbody')[0];
-            tableBody.innerHTML = "";
-            let grandTotal = 0;
-
-            if (dataToRender.length === 0) {
-                tableBody.innerHTML = "<tr><td colspan='4' style='text-align:center; color:red;'>Koi record nahi mila</td></tr>";
+                let a = parseFloat(document.getElementById('amt').value);
+                if(isNaN(a)) return;
+                entry.total = -a;
+                entry.desc = "Payment Rec.";
             }
 
-            dataToRender.forEach(entry => {
-                grandTotal += entry.total;
-                let row = tableBody.insertRow();
-                row.innerHTML = `
-                    <td style="font-size:12px; color:#666">${entry.date}</td>
-                    <td style="font-weight:bold">${entry.name}</td>
-                    <td><div>${entry.liters} L</div><div style="font-weight:bold; color:#28a745">₹${entry.total}</div></td>
-                    <td><button class="btn btn-danger" onclick="deleteEntry(${entry.id})">🗑️</button></td>
-                `;
+            db.unshift(entry);
+            localStorage.setItem('milk_db', JSON.stringify(db));
+            render();
+            document.getElementById('cust-name').value = '';
+            document.getElementById('liters').value = '';
+            document.getElementById('amt').value = '';
+        }
+
+        function render(items = db) {
+            let list = document.getElementById('list'), total = 0;
+            list.innerHTML = '';
+            items.forEach(e => {
+                total += e.total;
+                let isPay = e.type === 'pay';
+                list.innerHTML += `
+                    <div class="record-item ${isPay ? 'pay-type' : ''}">
+                        <div class="record-info">
+                            <span class="record-badge ${isPay ? 'badge-pay' : 'badge-milk'}">${isPay ? 'PAYMENT' : 'MILK'}</span>
+                            <span class="record-name">${e.name}</span>
+                            <span class="record-date">${e.date}</span>
+                            <small>${e.desc}</small>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div class="record-amount ${isPay ? 'amt-red' : 'amt-green'}">
+                                ${isPay ? '-' : ''}₹${Math.abs(e.total)}
+                            </div>
+                            <button class="btn-del" onclick="del(${e.id})">🗑️</button>
+                        </div>
+                    </div>`;
             });
-            document.getElementById("grandTotal").innerText = grandTotal.toFixed(2);
-            document.getElementById("entryCount").innerText = `(${dataToRender.length})`;
+            document.getElementById('grandTotal').innerText = total.toFixed(1);
         }
 
-        function clearAllData() {
-            if(confirm("Saara hisab delete ho jayega! Kya aap sure hain?")) {
-                milkData = [];
-                saveData();
-                renderTable(milkData);
-                closeNav();
-            }
-        }
-
-        function formatTime(date) {
-            let hours = date.getHours(); let minutes = date.getMinutes();
-            let ampm = hours >= 12 ? 'PM' : 'AM';
-            hours = hours % 12; hours = hours ? hours : 12; 
-            minutes = minutes < 10 ? '0'+minutes : minutes;
-            return hours + ':' + minutes + ' ' + ampm;
-        }
-
-        function printBill() { window.print(); }
-
-        function startVoice(fieldId) {
+        function del(id) { if(confirm("Delete?")) { db = db.filter(i => i.id !== id); localStorage.setItem('milk_db', JSON.stringify(db)); render(); } }
+        function filter() { let q = document.getElementById('search').value.toLowerCase(); render(db.filter(i => i.name.toLowerCase().includes(q))); }
+        function openNav() { document.getElementById("sidebar").style.width = "280px"; }
+        function closeNav() { document.getElementById("sidebar").style.width = "0"; }
+        function logout() { localStorage.removeItem('isLoggedIn'); location.reload(); }
+        function resetData() { if(confirm("Clear All?")) { db = []; localStorage.setItem('milk_db', '[]'); render(); closeNav(); } }
+        function startVoice() {
             if ('webkitSpeechRecognition' in window) {
-                var recognition = new webkitSpeechRecognition();
-                recognition.lang = 'hi-IN';
-                recognition.start();
-                recognition.onresult = function(event) {
-                    document.getElementById(fieldId).value = event.results[0][0].transcript;
-                };
-            } else { alert("Voice support nahi hai."); }
+                let r = new webkitSpeechRecognition(); r.lang = 'hi-IN'; r.start();
+                r.onresult = (e) => document.getElementById('cust-name').value = e.results[0][0].transcript;
+            }
         }
     </script>
 </body>
