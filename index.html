@@ -4,297 +4,252 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Milk Record Pro</title>
+    <title>Daily Milk Record Pro - Manual & Auto Rate</title>
     <style>
-        /* Modern UI Design */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f0f4f8; color: #333; }
-
-        /* Auth Screen */
-        .auth-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background: #007bff; color: white; position: fixed; top: 0; left: 0; width: 100%; z-index: 200; }
-        .login-box { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; width: 85%; max-width: 350px; color: #333; }
-        .login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
-        
-        header { background-color: #007bff; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .menu-icon { font-size: 24px; cursor: pointer; }
-        
-        #sidebar { height: 100%; width: 0; position: fixed; z-index: 150; top: 0; left: 0; background-color: #111; overflow-x: hidden; transition: 0.4s; padding-top: 60px; }
-        #sidebar a { padding: 15px 32px; text-decoration: none; font-size: 18px; color: #818181; display: block; border-bottom: 1px solid #222; }
-
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background-color: #f0f4f8; color: #333; }
+        header { background: #007bff; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .container { padding: 15px; max-width: 500px; margin: auto; }
         
         .total-box { background: #28a745; color: white; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(40,167,69,0.2); }
-        .total-amount { font-size: 30px; font-weight: 800; }
-
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #eef; }
-        .form-group { margin-bottom: 12px; position: relative; }
-        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; color: #555; font-size: 14px; }
+        .card { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #eef; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px; color: #555; }
         .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; background: #fafafa; }
         
-        .voice-btn { position: absolute; right: 8px; top: 28px; background: #28a745; color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; }
+        .category-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+        .tab-btn { flex: 1; padding: 12px; border: 1px solid #007bff; border-radius: 8px; background: white; cursor: pointer; text-align: center; font-weight: bold; }
+        .tab-btn.active { background: #007bff; color: white; }
 
-        .btn-save { background-color: #007bff; color: white; border: none; padding: 14px; border-radius: 8px; font-size: 18px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .calc-info { background: #e7f3ff; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; color: #0056b3; border-left: 4px solid #007bff; text-align: center; }
 
-        /* Record List */
-        .record-item { background: white; padding: 12px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; border-left: 5px solid #007bff; }
-        .record-item.pay-type { border-left-color: #ff4d4d; }
+        .record-item { background: white; padding: 12px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; border-left: 5px solid #007bff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; text-transform: uppercase; }
+        .badge-cow { background: #fff3cd; color: #856404; }
+        .badge-buffalo { background: #d1ecf1; color: #0c5460; }
         
-        .record-info { display: flex; flex-direction: column; }
-        .record-name { font-size: 16px; font-weight: 700; color: #222; }
-        .record-date { font-size: 11px; color: #888; }
-        .record-badge { font-size: 10px; padding: 2px 5px; border-radius: 4px; font-weight: bold; width: fit-content; margin-bottom: 4px; }
-        .badge-milk { background: #e7f3ff; color: #007bff; }
-        .badge-pay { background: #fee; color: #ff4d4d; }
+        .btn-save { background: #007bff; color: white; border: none; padding: 15px; border-radius: 8px; width: 100%; font-weight: bold; font-size: 18px; cursor: pointer; margin-top: 10px; }
+        .btn-del { background: #ff4d4d; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+        .search-bar { width: 100%; padding: 12px; border: 2px solid #007bff; border-radius: 25px; margin-bottom: 20px; box-sizing: border-box; outline: none; }
         
-        .record-amount { text-align: right; font-weight: 800; font-size: 17px; }
-        .amt-green { color: #28a745; }
-        .amt-red { color: #ff4d4d; }
-
-        .btn-del { background: #ff4d4d; color: white; border: none; padding: 8px; border-radius: 8px; cursor: pointer; }
-
-        /* Search Bar Enhanced */
-        .search-container { position: relative; margin-bottom: 20px; }
-        .search-bar { width: 100%; padding: 12px 12px 12px 40px; border: 2px solid #007bff; border-radius: 25px; outline: none; box-sizing: border-box; background: white; font-size: 16px; }
-        .search-icon { position: absolute; left: 15px; top: 12px; color: #007bff; }
-
-        @media print {
-            #sidebar, header, .form-card, .btn-del, .voice-btn, .auth-screen, .search-container { display: none !important; }
-            #app-screen, .container { display: block !important; width: 100%; }
-        }
+        .optional-text { font-size: 11px; font-weight: normal; color: #888; margin-left: 5px; }
     </style>
 </head>
 <body>
 
-    <div id="auth-box" class="auth-screen" style="display:none;">
-        <div class="login-box" id="reg-form">
-            <h2>🆕 Account Banayein</h2>
-            <input type="text" id="ru" placeholder="Username">
-            <input type="password" id="rp" placeholder="Password">
-            <input type="text" id="rs" placeholder="Secret Code (Security)">
-            <button class="btn-save" onclick="register()">Create Account</button>
-        </div>
-        <div class="login-box" id="log-form" style="display:none;">
-            <h2>🔐 Login Karein</h2>
-            <input type="text" id="lu" placeholder="User ID">
-            <input type="password" id="lp" placeholder="Password">
-            <button class="btn-save" onclick="login()">Login</button>
-        </div>
+<header>
+    <span>Daily Milk Pro</span>
+    <span onclick="window.print()" style="cursor:pointer">🖨️ Print</span>
+</header>
+
+<div class="container">
+    <div class="total-box">
+        <div style="font-size:12px; opacity: 0.9;">NET BALANCE (TOTAL)</div>
+        <div style="font-size:32px; font-weight:bold;">₹ <span id="grandTotal">0</span></div>
     </div>
 
-    <div id="main-app" style="display:none;">
-        <div id="sidebar">
-            <a href="javascript:void(0)" onclick="closeNav()" style="font-size:30px; color:white;">&times; Close</a>
-            <a href="#" onclick="logout()">🚪 Logout</a>
-            <a href="#" onclick="resetData()" style="color:red">🗑️ Delete All Data</a>
+    <div class="card">
+        <div class="form-group">
+            <label>Entry Type</label>
+            <select id="entry-type" onchange="toggleForm()">
+                <option value="milk">🥛 Milk Entry</option>
+                <option value="pay">💸 Payment / Advance</option>
+            </select>
         </div>
 
-        <header>
-            <span class="menu-icon" onclick="openNav()">&#9776;</span>
-            <span>Daily Milk Record</span>
-            <span onclick="window.print()" style="font-size: 24px; cursor: pointer;">🖨️</span>
-        </header>
-
-        <div class="container">
-            <div class="total-box">
-                <div id="total-label" style="font-size:12px;">KUL BAAKI (TOTAL)</div>
-                <div class="total-amount">₹ <span id="grandTotal">0</span></div>
+        <div id="milk-section">
+            <label>Category</label>
+            <div class="category-tabs">
+                <div id="tab-cow" class="tab-btn active" onclick="setCategory('Cow')">🐄 Cow</div>
+                <div id="tab-buffalo" class="tab-btn" onclick="setCategory('Buffalo')">🐃 Buffalo</div>
             </div>
 
-            <div class="card form-card">
-                <div class="form-group">
-                    <label>Entry Type</label>
-                    <select id="type" onchange="toggleInputs()">
-                        <option value="milk">🥛 Milk (Doodh)</option>
-                        <option value="pay">💸 Advance / Payment</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Customer Name</label>
-                    <input type="text" id="cust-name" placeholder="Naam likhein...">
-                    <button class="voice-btn" onclick="startVoice()">🎤</button>
-                </div>
-
-                <div id="milk-inputs" style="display: flex; gap: 10px;">
-                    <div class="form-group" style="flex:1">
-                        <label>Liter (L)</label>
-                        <input type="number" id="liters" placeholder="0" step="any">
-                    </div>
-                    <div class="form-group" style="flex:1">
-                        <label>Rate (₹)</label>
-                        <input type="number" id="rate" value="60">
-                    </div>
-                </div>
-
-                <div id="pay-inputs" class="form-group" style="display:none;">
-                    <label>Amount (₹ Paisa)</label>
-                    <input type="number" id="amt" placeholder="0">
-                </div>
-
-                <button class="btn-save" onclick="saveEntry()">✅ Save Entry</button>
+            <div class="form-group">
+                <label>Customer Name</label>
+                <input type="text" id="cust-name" placeholder="Naam likhein...">
             </div>
 
-            <div class="search-container">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="search" oninput="filter()" class="search-bar" placeholder="Naam ya date se search karein...">
+            <div style="display:flex; gap:10px;">
+                <div class="form-group" style="flex:1">
+                    <label>Liters</label>
+                    <input type="number" id="liters" placeholder="0.0" oninput="autoCalc()">
+                </div>
+                <div class="form-group" style="flex:1">
+                    <label>Rate (₹)</label>
+                    <input type="number" id="manual-rate" placeholder="₹" oninput="autoCalc()">
+                </div>
             </div>
 
-            <div id="list"></div>
+            <div style="display:flex; gap:10px;">
+                <div class="form-group" style="flex:1">
+                    <label>Fat <span class="optional-text">(Optional)</span></label>
+                    <input type="number" id="fat" placeholder="0.0" oninput="autoCalc()">
+                </div>
+                <div class="form-group" style="flex:1">
+                    <label>SNF <span class="optional-text">(Optional)</span></label>
+                    <input type="number" id="snf" placeholder="0.0" oninput="autoCalc()">
+                </div>
+            </div>
+
+            <div class="calc-info" id="calc-display">
+                Liters aur Rate bharein...
+            </div>
         </div>
+
+        <div id="pay-section" style="display:none;">
+            <div class="form-group">
+                <label>Amount (₹)</label>
+                <input type="number" id="pay-amt" placeholder="Kitna paisa mila?">
+            </div>
+        </div>
+
+        <button class="btn-save" onclick="saveData()">✅ Save Entry</button>
     </div>
 
-    <script>
-        let db = JSON.parse(localStorage.getItem('milk_db')) || [];
-        let authData = JSON.parse(localStorage.getItem('milk_auth')) || null;
+    <input type="text" id="search" oninput="render()" class="search-bar" placeholder="🔍 Search by name...">
+    <div id="list"></div>
+</div>
 
-        window.onload = () => {
-            if(localStorage.getItem('isLoggedIn')) showMain();
-            else checkAuth();
+<script>
+    let db = JSON.parse(localStorage.getItem('milk_db')) || [];
+    let currentCategory = 'Cow';
+
+    // Dairy Formula Settings
+    const settings = {
+        Cow: { baseRate: 45, baseFat: 3.5, baseSNF: 8.5, defRate: 50 },
+        Buffalo: { baseRate: 65, baseFat: 6.0, baseSNF: 9.0, defRate: 70 }
+    };
+
+    function setCategory(cat) {
+        currentCategory = cat;
+        document.getElementById('tab-cow').classList.toggle('active', cat === 'Cow');
+        document.getElementById('tab-buffalo').classList.toggle('active', cat === 'Buffalo');
+        // Reset manual rate based on category if empty
+        if(!document.getElementById('manual-rate').value) {
+            document.getElementById('manual-rate').value = settings[cat].defRate;
+        }
+        autoCalc();
+    }
+
+    // Default rate set on load
+    document.getElementById('manual-rate').value = settings.Cow.defRate;
+
+    function toggleForm() {
+        let type = document.getElementById('entry-type').value;
+        document.getElementById('milk-section').style.display = (type === 'milk') ? 'block' : 'none';
+        document.getElementById('pay-section').style.display = (type === 'pay') ? 'block' : 'none';
+    }
+
+    function autoCalc() {
+        let fat = parseFloat(document.getElementById('fat').value) || 0;
+        let snf = parseFloat(document.getElementById('snf').value) || 0;
+        let liters = parseFloat(document.getElementById('liters').value) || 0;
+        let mRate = parseFloat(document.getElementById('manual-rate').value) || 0;
+        
+        let finalRate = mRate;
+        let method = "Manual";
+
+        // Agar Fat aur SNF dono bhare hain, toh formula use karein
+        if(fat > 0 && snf > 0) {
+            let s = settings[currentCategory];
+            finalRate = s.baseRate * ((fat / s.baseFat + snf / s.baseSNF) / 2);
+            method = "Fat/SNF";
+        }
+
+        let total = finalRate * liters;
+        
+        if(liters > 0) {
+            document.getElementById('calc-display').innerHTML = 
+                `Method: <b>${method}</b> | Rate: <b>₹${finalRate.toFixed(2)}</b><br>Total: <b>₹${total.toFixed(2)}</b>`;
+        } else {
+            document.getElementById('calc-display').innerHTML = "Liters bharein...";
+        }
+        
+        return { rate: finalRate, total: total, method: method };
+    }
+
+    function saveData() {
+        let name = document.getElementById('cust-name').value.trim();
+        let type = document.getElementById('entry-type').value;
+        if(!name) return alert("Naam likhna zaruri hai!");
+
+        let entry = {
+            id: Date.now(),
+            name: name,
+            date: new Date().toLocaleDateString('en-GB'),
+            time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
         };
 
-        function checkAuth() {
-            document.getElementById('auth-box').style.display = 'flex';
-            if(authData) {
-                document.getElementById('reg-form').style.display = 'none';
-                document.getElementById('log-form').style.display = 'block';
-            }
-        }
-
-        function register() {
-            let u = document.getElementById('ru').value, p = document.getElementById('rp').value, s = document.getElementById('rs').value;
-            if(u && p && s) {
-                authData = {u, p, s};
-                localStorage.setItem('milk_auth', JSON.stringify(authData));
-                checkAuth();
-            }
-        }
-
-        function login() {
-            let u = document.getElementById('lu').value, p = document.getElementById('lp').value;
-            if(authData && u === authData.u && p === authData.p) {
-                localStorage.setItem('isLoggedIn', 'true');
-                showMain();
-            } else { alert("Galat ID/Password!"); }
-        }
-
-        function showMain() {
-            document.getElementById('auth-box').style.display = 'none';
-            document.getElementById('main-app').style.display = 'block';
-            render();
-        }
-
-        function toggleInputs() {
-            let t = document.getElementById('type').value;
-            document.getElementById('milk-inputs').style.display = (t === 'milk') ? 'flex' : 'none';
-            document.getElementById('pay-inputs').style.display = (t === 'pay') ? 'block' : 'none';
-        }
-
-        function saveEntry() {
-            let n = document.getElementById('cust-name').value.trim(), t = document.getElementById('type').value;
-            if(!n) { alert("Naam likhna zaroori hai!"); return; }
-
-            let entry = { 
-                id: Date.now(), 
-                name: n, 
-                type: t, 
-                date: new Date().toLocaleDateString('en-GB') + " " + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) 
-            };
-
-            if(t === 'milk') {
-                let l = parseFloat(document.getElementById('liters').value), r = parseFloat(document.getElementById('rate').value);
-                if(isNaN(l) || l <= 0) return;
-                entry.total = l * r;
-                entry.desc = l + "L @ ₹" + r;
-            } else {
-                let a = parseFloat(document.getElementById('amt').value);
-                if(isNaN(a) || a <= 0) return;
-                entry.total = -a;
-                entry.desc = "Payment Received";
-            }
-
-            db.unshift(entry);
-            localStorage.setItem('milk_db', JSON.stringify(db));
+        if(type === 'milk') {
+            let res = autoCalc();
+            if(!res || res.total === 0) return alert("Liter aur Rate (ya Fat/SNF) sahi bharein!");
             
-            // Clear inputs
-            document.getElementById('cust-name').value = '';
-            document.getElementById('liters').value = '';
-            document.getElementById('amt').value = '';
-            document.getElementById('search').value = ''; // Reset search on new entry
-            
-            render();
+            let fatVal = document.getElementById('fat').value;
+            let snfVal = document.getElementById('snf').value;
+
+            entry.type = 'milk';
+            entry.category = currentCategory;
+            entry.total = res.total;
+            entry.desc = `${document.getElementById('liters').value}L @ ₹${res.rate.toFixed(2)}`;
+            if(fatVal && snfVal) entry.desc += ` (F:${fatVal} S:${snfVal})`;
+        } else {
+            let amt = parseFloat(document.getElementById('pay-amt').value);
+            if(!amt) return;
+            entry.type = 'pay';
+            entry.category = 'Payment';
+            entry.total = -amt;
+            entry.desc = "💸 Payment Received";
         }
 
-        // Search and Render Integrated Logic
-        function render(items = db) {
-            let list = document.getElementById('list'), total = 0;
-            list.innerHTML = '';
-            
-            if (items.length === 0) {
-                list.innerHTML = `<div style="text-align:center; padding:30px; color:#888;">No records found.</div>`;
-                document.getElementById('grandTotal').innerText = "0";
-                return;
-            }
-
-            items.forEach(e => {
-                total += e.total;
-                let isPay = e.type === 'pay';
-                list.innerHTML += `
-                    <div class="record-item ${isPay ? 'pay-type' : ''}">
-                        <div class="record-info">
-                            <span class="record-badge ${isPay ? 'badge-pay' : 'badge-milk'}">${isPay ? 'PAYMENT' : 'MILK'}</span>
-                            <span class="record-name">${e.name}</span>
-                            <span class="record-date">${e.date}</span>
-                            <small>${e.desc}</small>
-                        </div>
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <div class="record-amount ${isPay ? 'amt-red' : 'amt-green'}">
-                                ${isPay ? '-' : ''}₹${Math.abs(e.total).toFixed(1)}
-                            </div>
-                            <button class="btn-del" onclick="del(${e.id})">🗑️</button>
-                        </div>
-                    </div>`;
-            });
-            
-            document.getElementById('grandTotal').innerText = total.toFixed(1);
-            
-            // Update label if searching
-            let isSearching = document.getElementById('search').value.length > 0;
-            document.getElementById('total-label').innerText = isSearching ? "SEARCH TOTAL" : "KUL BAAKI (TOTAL)";
-        }
-
-        function filter() {
-            let q = document.getElementById('search').value.toLowerCase().trim();
-            if(!q) {
-                render(db);
-                return;
-            }
-            let filtered = db.filter(i => 
-                i.name.toLowerCase().includes(q) || 
-                i.date.toLowerCase().includes(q)
-            );
-            render(filtered);
-        }
-
-        function del(id) { 
-            if(confirm("Kya aap is record ko delete karna chahte hain?")) { 
-                db = db.filter(i => i.id !== id); 
-                localStorage.setItem('milk_db', JSON.stringify(db)); 
-                filter(); // Re-filter after delete
-            } 
-        }
-
-        function openNav() { document.getElementById("sidebar").style.width = "280px"; }
-        function closeNav() { document.getElementById("sidebar").style.width = "0"; }
-        function logout() { localStorage.removeItem('isLoggedIn'); location.reload(); }
-        function resetData() { if(confirm("SAVDHANI: Saara data hamesha ke liye delete ho jayega. Kya aap sure hain?")) { db = []; localStorage.setItem('milk_db', '[]'); render(); closeNav(); } }
+        db.unshift(entry);
+        localStorage.setItem('milk_db', JSON.stringify(db));
         
-        function startVoice() {
-            if ('webkitSpeechRecognition' in window) {
-                let r = new webkitSpeechRecognition(); r.lang = 'hi-IN'; r.start();
-                r.onresult = (e) => {
-                    document.getElementById('cust-name').value = e.results[0][0].transcript;
-                }
-            } else { alert("Aapka browser voice input support nahi karta."); }
+        // Reset
+        document.getElementById('liters').value = '';
+        document.getElementById('fat').value = '';
+        document.getElementById('snf').value = '';
+        document.getElementById('pay-amt').value = '';
+        render();
+    }
+
+    function render() {
+        let list = document.getElementById('list'), total = 0;
+        let query = document.getElementById('search').value.toLowerCase();
+        list.innerHTML = '';
+
+        let filtered = db.filter(i => i.name.toLowerCase().includes(query));
+
+        filtered.forEach(item => {
+            total += item.total;
+            let bClass = item.category === 'Cow' ? 'badge-cow' : (item.category === 'Buffalo' ? 'badge-buffalo' : '');
+            list.innerHTML += `
+                <div class="record-item" style="border-left-color: ${item.total < 0 ? '#ff4d4d' : '#28a745'}">
+                    <div style="flex:1">
+                        <span class="badge ${bClass}">${item.category}</span>
+                        <div style="font-weight:bold; font-size:16px; margin-top:4px;">${item.name}</div>
+                        <div style="font-size:11px; color:#777;">${item.date} | ${item.time}</div>
+                        <div style="font-size:13px; color:#444;">${item.desc}</div>
+                    </div>
+                    <div style="text-align:right">
+                        <div style="font-weight:bold; font-size:18px; color:${item.total < 0 ? '#ff4d4d' : '#28a745'}">
+                            ${item.total < 0 ? '-' : ''}₹${Math.abs(item.total).toFixed(1)}
+                        </div>
+                        <button class="btn-del" onclick="deleteItem(${item.id})" style="margin-top:8px;">🗑️</button>
+                    </div>
+                </div>`;
+        });
+        document.getElementById('grandTotal').innerText = total.toFixed(1);
+    }
+
+    function deleteItem(id) {
+        if(confirm("Delete karna chahte hain?")) {
+            db = db.filter(i => i.id !== id);
+            localStorage.setItem('milk_db', JSON.stringify(db));
+            render();
         }
-    </script>
+    }
+
+    render();
+</script>
 </body>
 </html>
