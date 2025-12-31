@@ -8,29 +8,22 @@
         body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; background-color: #f0f4f8; color: #333; }
         header { background: #007bff; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .container { padding: 15px; max-width: 500px; margin: auto; }
-        
         .total-box { background: #28a745; color: white; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(40,167,69,0.2); }
         .card { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #eef; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px; color: #555; }
         .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; background: #fafafa; }
-        
         .category-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
         .tab-btn { flex: 1; padding: 12px; border: 1px solid #007bff; border-radius: 8px; background: white; cursor: pointer; text-align: center; font-weight: bold; }
         .tab-btn.active { background: #007bff; color: white; }
-
         .calc-info { background: #e7f3ff; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; color: #0056b3; border-left: 4px solid #007bff; text-align: center; }
-
         .record-item { background: white; padding: 12px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; border-left: 5px solid #007bff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; text-transform: uppercase; }
         .badge-cow { background: #fff3cd; color: #856404; }
         .badge-buffalo { background: #d1ecf1; color: #0c5460; }
-        
         .btn-save { background: #007bff; color: white; border: none; padding: 15px; border-radius: 8px; width: 100%; font-weight: bold; font-size: 18px; cursor: pointer; margin-top: 10px; }
         .btn-del { background: #ff4d4d; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
         .search-bar { width: 100%; padding: 12px; border: 2px solid #007bff; border-radius: 25px; margin-bottom: 20px; box-sizing: border-box; outline: none; }
-
         .optional-text { font-size: 11px; font-weight: normal; color: #888; margin-left: 5px; }
     </style>
 </head>
@@ -153,18 +146,19 @@
         let fat = parseFloat(document.getElementById('fat').value) || 0;
         let snf = parseFloat(document.getElementById('snf').value) || 0;
         let liters = parseFloat(document.getElementById('liters').value) || 0;
-        let mRate = parseFloat(document.getElementById('manual-rate').value) || 0;
+        let manualRate = parseFloat(document.getElementById('manual-rate').value) || 0;
         let clr = parseFloat(document.getElementById('clr').value) || 0;
         let water = parseFloat(document.getElementById('water').value) || 0;
 
         let s = settings[currentCategory];
-
-        // Base rate
         let baseRate = s.baseRate;
         let finalRate = baseRate;
         let method = "Base Rate";
 
-        if(fat > 0 && snf > 0) {
+        if(manualRate > 0) {
+            finalRate = manualRate;
+            method = "Manual Rate";
+        } else if(fat > 0 && snf > 0) {
             let kFat = 0.1;
             let kSNF = 0.05;
             finalRate = baseRate * (1 + kFat*(fat - s.baseFat) + kSNF*(snf - s.baseSNF));
@@ -276,7 +270,14 @@
         }
     }
 
-    document.getElementById('print-btn').onclick = () => window.print();
+    // Print button fix
+    document.getElementById('print-btn').onclick = () => {
+        if(typeof window.Android !== "undefined" && window.Android.printPage){
+            window.Android.printPage();
+        } else {
+            window.print();
+        }
+    }
 
     render();
 </script>
