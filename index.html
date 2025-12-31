@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="hi">
 <head>
@@ -31,7 +30,7 @@
         .btn-save { background: #007bff; color: white; border: none; padding: 15px; border-radius: 8px; width: 100%; font-weight: bold; font-size: 18px; cursor: pointer; margin-top: 10px; }
         .btn-del { background: #ff4d4d; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
         .search-bar { width: 100%; padding: 12px; border: 2px solid #007bff; border-radius: 25px; margin-bottom: 20px; box-sizing: border-box; outline: none; }
-        
+
         .optional-text { font-size: 11px; font-weight: normal; color: #888; margin-left: 5px; }
     </style>
 </head>
@@ -39,7 +38,7 @@
 
 <header>
     <span>Daily Milk Pro</span>
-    <span onclick="window.print()" style="cursor:pointer">🖨️ Print</span>
+    <span id="print-btn" style="cursor:pointer">🖨️ Print</span>
 </header>
 
 <div class="container">
@@ -91,12 +90,27 @@
                 </div>
             </div>
 
+            <div style="display:flex; gap:10px;">
+                <div class="form-group" style="flex:1">
+                    <label>CLR</label>
+                    <input type="number" id="clr" placeholder="0.0" oninput="autoCalc()">
+                </div>
+                <div class="form-group" style="flex:1">
+                    <label>Water</label>
+                    <input type="number" id="water" placeholder="0.0" oninput="autoCalc()">
+                </div>
+            </div>
+
             <div class="calc-info" id="calc-display">
                 Liters aur Rate bharein...
             </div>
         </div>
 
         <div id="pay-section" style="display:none;">
+            <div class="form-group">
+                <label>Customer Name</label>
+                <input type="text" id="pay-name" placeholder="Naam likhein...">
+            </div>
             <div class="form-group">
                 <label>Amount (₹)</label>
                 <input type="number" id="pay-amt" placeholder="Kitna paisa mila?">
@@ -114,25 +128,20 @@
     let db = JSON.parse(localStorage.getItem('milk_db')) || [];
     let currentCategory = 'Cow';
 
-    // Dairy Formula Settings
     const settings = {
-        Cow: { baseRate: 45, baseFat: 3.5, baseSNF: 8.5, defRate: 50 },
-        Buffalo: { baseRate: 65, baseFat: 6.0, baseSNF: 9.0, defRate: 70 }
+        Cow: { baseRate: 50, baseFat: 4, baseSNF: 8.5 },
+        Buffalo: { baseRate: 80, baseFat: 6, baseSNF: 9 }
     };
+
+    document.getElementById('manual-rate').value = settings.Cow.baseRate;
 
     function setCategory(cat) {
         currentCategory = cat;
         document.getElementById('tab-cow').classList.toggle('active', cat === 'Cow');
         document.getElementById('tab-buffalo').classList.toggle('active', cat === 'Buffalo');
-        // Reset manual rate based on category if empty
-        if(!document.getElementById('manual-rate').value) {
-            document.getElementById('manual-rate').value = settings[cat].defRate;
-        }
+        if(!document.getElementById('manual-rate').value) document.getElementById('manual-rate').value = settings[cat].baseRate;
         autoCalc();
     }
-
-    // Default rate set on load
-    document.getElementById('manual-rate').value = settings.Cow.defRate;
 
     function toggleForm() {
         let type = document.getElementById('entry-type').value;
@@ -145,32 +154,43 @@
         let snf = parseFloat(document.getElementById('snf').value) || 0;
         let liters = parseFloat(document.getElementById('liters').value) || 0;
         let mRate = parseFloat(document.getElementById('manual-rate').value) || 0;
-        
-        let finalRate = mRate;
-        let method = "Manual";
+        let clr = parseFloat(document.getElementById('clr').value) || 0;
+        let water = parseFloat(document.getElementById('water').value) || 0;
 
-        // Agar Fat aur SNF dono bhare hain, toh formula use karein
+        let s = settings[currentCategory];
+
+        // Base rate
+        let baseRate = s.baseRate;
+        let finalRate = baseRate;
+        let method = "Base Rate";
+
         if(fat > 0 && snf > 0) {
-            let s = settings[currentCategory];
-            finalRate = s.baseRate * ((fat / s.baseFat + snf / s.baseSNF) / 2);
-            method = "Fat/SNF";
+            let kFat = 0.1;
+            let kSNF = 0.05;
+            finalRate = baseRate * (1 + kFat*(fat - s.baseFat) + kSNF*(snf - s.baseSNF));
+            method = "Fat/SNF Adjusted";
+        }
+
+        if(water > 0) {
+            let kWater = 0.02;
+            finalRate = finalRate * (1 - kWater * water);
+            method += " + Water Adjusted";
         }
 
         let total = finalRate * liters;
-        
+
         if(liters > 0) {
-            document.getElementById('calc-display').innerHTML = 
-                `Method: <b>${method}</b> | Rate: <b>₹${finalRate.toFixed(2)}</b><br>Total: <b>₹${total.toFixed(2)}</b>`;
+            document.getElementById('calc-display').innerHTML = `Method: <b>${method}</b> | Rate: <b>₹${finalRate.toFixed(2)}</b><br>Total: <b>₹${total.toFixed(2)}</b>`;
         } else {
             document.getElementById('calc-display').innerHTML = "Liters bharein...";
         }
-        
+
         return { rate: finalRate, total: total, method: method };
     }
 
     function saveData() {
-        let name = document.getElementById('cust-name').value.trim();
         let type = document.getElementById('entry-type').value;
+        let name = type === 'milk' ? document.getElementById('cust-name').value.trim() : document.getElementById('pay-name').value.trim();
         if(!name) return alert("Naam likhna zaruri hai!");
 
         let entry = {
@@ -183,32 +203,39 @@
         if(type === 'milk') {
             let res = autoCalc();
             if(!res || res.total === 0) return alert("Liter aur Rate (ya Fat/SNF) sahi bharein!");
-            
-            let fatVal = document.getElementById('fat').value;
-            let snfVal = document.getElementById('snf').value;
 
             entry.type = 'milk';
             entry.category = currentCategory;
             entry.total = res.total;
             entry.desc = `${document.getElementById('liters').value}L @ ₹${res.rate.toFixed(2)}`;
+            let fatVal = document.getElementById('fat').value;
+            let snfVal = document.getElementById('snf').value;
+            let clrVal = document.getElementById('clr').value;
+            let waterVal = document.getElementById('water').value;
             if(fatVal && snfVal) entry.desc += ` (F:${fatVal} S:${snfVal})`;
+            if(clrVal) entry.desc += ` | CLR:${clrVal}`;
+            if(waterVal) entry.desc += ` | Water:${waterVal}`;
+
         } else {
             let amt = parseFloat(document.getElementById('pay-amt').value);
             if(!amt) return;
             entry.type = 'pay';
             entry.category = 'Payment';
             entry.total = -amt;
-            entry.desc = "💸 Payment Received";
+            entry.desc = `💸 Payment Received by ${name}`;
         }
 
         db.unshift(entry);
         localStorage.setItem('milk_db', JSON.stringify(db));
-        
-        // Reset
+
         document.getElementById('liters').value = '';
         document.getElementById('fat').value = '';
         document.getElementById('snf').value = '';
+        document.getElementById('clr').value = '';
+        document.getElementById('water').value = '';
         document.getElementById('pay-amt').value = '';
+        document.getElementById('cust-name').value = '';
+        document.getElementById('pay-name').value = '';
         render();
     }
 
@@ -249,7 +276,10 @@
         }
     }
 
+    document.getElementById('print-btn').onclick = () => window.print();
+
     render();
 </script>
 </body>
 </html>
+
